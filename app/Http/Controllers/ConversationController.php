@@ -6,7 +6,6 @@ use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Conversation\UpdateConversationRequest;
 use App\Http\Resources\Conversation\ConversationResource;
 use App\Models\Conversation;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
@@ -27,6 +26,7 @@ class ConversationController extends Controller
     public function store(StoreConversationRequest $request): ConversationResource
     {
         $conversation = Conversation::create($request->validated());
+        $conversation->users()->sync([auth()->user()->id, $request->to_user_id]);
 
         return ConversationResource::make($conversation);
     }
@@ -37,7 +37,7 @@ class ConversationController extends Controller
      */
     public function show(Conversation $conversation): ConversationResource
     {
-        $conversation = Conversation::where('id', $conversation->id)->with('messages')->get();
+        $conversation = Conversation::where('id', $conversation->id)->with(['messages', 'users'])->get();
 
         return ConversationResource::make($conversation);
     }
