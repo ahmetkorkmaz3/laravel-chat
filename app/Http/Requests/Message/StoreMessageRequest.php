@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests\Message;
 
+use App\Enums\MessageType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreMessageRequest extends FormRequest
 {
@@ -11,9 +14,9 @@ class StoreMessageRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return Auth::check();
     }
 
     /**
@@ -21,10 +24,17 @@ class StoreMessageRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            //
+            'content' => [
+                'required',
+                'string',
+            ],
+            'type' => [
+                'nullable',
+                Rule::in(MessageType::list()),
+            ],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Conversation;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreConversationRequest extends FormRequest
 {
@@ -11,9 +12,9 @@ class StoreConversationRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return Auth::check();
     }
 
     /**
@@ -21,10 +22,22 @@ class StoreConversationRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            //
+            'is_group' => [
+                'nullable',
+                'boolean',
+            ],
+            'name' => [
+                'String',
+                'min:3',
+                'required_with:is_group',
+            ],
+            'to_user_id' => [
+                'integer',
+                'exists:users,id',
+            ],
         ];
     }
 }
