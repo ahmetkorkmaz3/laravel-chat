@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,11 @@ Route::middleware('auth:api')->group(function () {
             Route::get('', [ConversationController::class, 'show']);
             Route::put('', [ConversationController::class, 'update']);
             Route::delete('', [ConversationController::class, 'destroy']);
+
+            Route::prefix('messages')->group(function () {
+                Route::get('', [MessageController::class, 'index']);
+                Route::post('', [MessageController::class, 'store']);
+            });
         });
     });
 

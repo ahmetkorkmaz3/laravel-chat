@@ -2,63 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Message\StoreMessageRequest;
+use App\Http\Resources\Message\MessageResource;
+use App\Models\Conversation;
 use App\Models\Message;
-use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MessageController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * @param Conversation $conversation
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(Conversation $conversation): AnonymousResourceCollection
     {
-        //
+        $messages = Message::where('conversation_id', $conversation->id)
+            ->with(['conversation', 'user'])
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        return MessageResource::collection($messages);
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreMessageRequest $request
+     * @param Conversation $conversation
+     * @return MessageResource
      */
-    public function store(Request $request)
+    public function store(StoreMessageRequest $request, Conversation $conversation): MessageResource
     {
-        //
-    }
+        $message = $conversation->messages()->create($request->validated());
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Message $message)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Message $message)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Message $message)
-    {
-        //
+        return MessageResource::make($message);
     }
 }
