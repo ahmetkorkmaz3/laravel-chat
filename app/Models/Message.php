@@ -15,6 +15,7 @@ class Message extends Model
         'content',
         'type',
         'is_read',
+        'user_id',
     ];
 
     public function conversation(): BelongsTo
