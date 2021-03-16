@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ConversationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,4 +28,19 @@ Route::group([
     Route::get('me', [AuthController::class, 'me']);
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']);
+});
+
+Route::middleware('auth:api')->group(function () {
+
+    Route::prefix('conversations')->group(function () {
+        Route::get('', [ConversationController::class, 'index']);
+        Route::post('', [ConversationController::class, 'store']);
+
+        Route::prefix('{conversation}')->group(function () {
+            Route::get('', [ConversationController::class, 'show']);
+            Route::put('', [ConversationController::class, 'update']);
+            Route::delete('', [ConversationController::class, 'destroy']);
+        });
+    });
+
 });
