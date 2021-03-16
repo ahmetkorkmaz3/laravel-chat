@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
+use Illuminate\Support\Facades\Broadcast;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +16,8 @@ use App\Http\Controllers\MessageController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Broadcast::routes();
 
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);

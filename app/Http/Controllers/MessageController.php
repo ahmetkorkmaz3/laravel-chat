@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ConversationEvent;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageResource;
 use App\Models\Conversation;
@@ -37,6 +38,8 @@ class MessageController extends Controller
             $request->validated(),
             ['user_id' => auth()->user()->id]
         ));
+
+        event(new ConversationEvent($message, $conversation->receiverUser()));
 
         return MessageResource::make($message);
     }
