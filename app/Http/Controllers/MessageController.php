@@ -21,6 +21,8 @@ class MessageController extends Controller
             ->orderBy('created_at', 'DESC')
             ->get();
 
+        $conversation->messages()->update(['is_read' => true]);
+
         return MessageResource::collection($messages);
     }
 
@@ -31,7 +33,10 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request, Conversation $conversation): MessageResource
     {
-        $message = $conversation->messages()->create($request->validated());
+        $message = $conversation->messages()->create(array_merge(
+            $request->validated(),
+            ['user_id' => auth()->user()->id]
+        ));
 
         return MessageResource::make($message);
     }
