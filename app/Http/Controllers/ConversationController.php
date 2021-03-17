@@ -8,6 +8,8 @@ use App\Http\Resources\Conversation\ConversationResource;
 use App\Models\Conversation;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use PHPUnit\Util\Exception;
 
 class ConversationController extends Controller
 {
@@ -16,7 +18,13 @@ class ConversationController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        return ConversationResource::collection(auth()->user()->conversations);
+        $conversations = Conversation::whereHas('users', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        })->with(['messages' => function ($query) {
+            $query->orderBy('created_at', 'DESC')->first();
+        }])->orderBy('created_at', 'DESC')->get();
+
+        return ConversationResource::collection($conversations);
     }
 
     /**
@@ -25,8 +33,17 @@ class ConversationController extends Controller
      */
     public function store(StoreConversationRequest $request): ConversationResource
     {
-        $conversation = Conversation::create($request->validated());
-        $conversation->users()->sync([auth()->user()->id, $request->to_user_id]);
+        DB::beginTransaction();
+        try {
+            $conversation = Conversation::create($request->validated());
+            $users = $request->to_user_id;
+            array_push($users, auth()->user()->id);
+            $conversation->users()->attach($users);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            abort(500, $exception);
+        }
+        DB::commit();
 
         return ConversationResource::make($conversation);
     }
