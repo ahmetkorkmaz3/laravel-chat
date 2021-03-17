@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class Conversation extends Model
 {
@@ -37,8 +38,14 @@ class Conversation extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function receiverUser(): Collection
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection|mixed|null
+     */
+    public function receiverUser()
     {
-        return $this->users()->whereNotIn('user_id', [auth()->user()->id])->get();
+        if ($this->is_group) {
+            return $this->users()->whereNotIn('user_id', [auth()->user()->id])->get();
+        }
+        return $this->users()->where('user_id', '!=', auth()->user()->id)->first();
     }
 }

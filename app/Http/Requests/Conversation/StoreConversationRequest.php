@@ -35,8 +35,11 @@ class StoreConversationRequest extends FormRequest
                 'required_with:is_group',
             ],
             'to_user_id' => [
-                'integer',
+                'array',
+            ],
+            'to_user_id.*' => [
                 'exists:users,id',
+                'integer',
             ],
         ];
     }

@@ -39,7 +39,13 @@ class MessageController extends Controller
             ['user_id' => auth()->user()->id]
         ));
 
-        event(new ConversationEvent($message, $conversation->receiverUser()[0]->id));
+        if ($conversation->is_group) {
+            $conversation->receiverUser()->each(function ($user) use ($message) {
+                event(new ConversationEvent($message, $user->id));
+            });
+        } else {
+            event(new ConversationEvent($message, $conversation->receiverUser()->id));
+        }
 
         return MessageResource::make($message);
     }
