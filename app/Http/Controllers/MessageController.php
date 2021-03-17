@@ -39,7 +39,7 @@ class MessageController extends Controller
             ['user_id' => auth()->user()->id]
         ));
 
-        event(new ConversationEvent($message, $conversation->receiverUser()));
+        event(new ConversationEvent($message, $conversation->receiverUser()[0]->id));
 
         return MessageResource::make($message);
     }
