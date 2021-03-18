@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Collection;
-use phpDocumentor\Reflection\Types\Boolean;
+use Illuminate\Support\Facades\DB;
 
 class Conversation extends Model
 {
@@ -26,6 +26,9 @@ class Conversation extends Model
 
         static::deleting(function ($conversation) {
             $conversation->messages()->delete();
+            DB::table('conversation_user')
+                ->where('conversation_id', $conversation->id)
+                ->delete();
         });
     }
 
@@ -40,7 +43,7 @@ class Conversation extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Collection|mixed|null
+     * @return Collection|mixed|null
      */
     public function receiverUser()
     {
