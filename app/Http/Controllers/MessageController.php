@@ -7,6 +7,7 @@ use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class MessageController extends Controller
@@ -14,9 +15,12 @@ class MessageController extends Controller
     /**
      * @param Conversation $conversation
      * @return AnonymousResourceCollection
+     * @throws AuthorizationException
      */
     public function index(Conversation $conversation): AnonymousResourceCollection
     {
+        $this->authorize('view', $conversation);
+
         $messages = Message::where('conversation_id', $conversation->id)
             ->with(['conversation', 'user'])
             ->orderBy('created_at', 'DESC')
@@ -31,9 +35,12 @@ class MessageController extends Controller
      * @param StoreMessageRequest $request
      * @param Conversation $conversation
      * @return MessageResource
+     * @throws AuthorizationException
      */
     public function store(StoreMessageRequest $request, Conversation $conversation): MessageResource
     {
+        $this->authorize('create', $conversation);
+
         $message = $conversation->messages()->create(array_merge(
             $request->validated(),
             ['user_id' => auth()->user()->id]
