@@ -4,6 +4,7 @@ namespace App\Http\Requests\Conversation;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreConversationRequest extends FormRequest
 {
@@ -30,7 +31,7 @@ class StoreConversationRequest extends FormRequest
                 'boolean',
             ],
             'name' => [
-                'String',
+                'string',
                 'min:3',
                 'required_with:is_group',
             ],
@@ -38,8 +39,9 @@ class StoreConversationRequest extends FormRequest
                 'array',
             ],
             'to_user_id.*' => [
-                'exists:users,id',
                 'integer',
+                'exists:users,id',
+                Rule::notIn([auth()->user()->id]),
             ],
         ];
     }
