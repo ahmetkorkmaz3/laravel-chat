@@ -63,7 +63,7 @@ class ConversationController extends Controller
     {
         $this->authorize('view', $conversation);
 
-        $conversation = Conversation::where('id', $conversation->id)->with(['messages', 'users'])->first();
+        $conversation->load(['users', 'messages']);
 
         return ConversationResource::make($conversation);
     }
