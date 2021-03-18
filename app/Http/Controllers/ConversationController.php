@@ -18,11 +18,10 @@ class ConversationController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        $conversations = Conversation::whereHas('users', function ($query) {
-            $query->where('user_id', auth()->user()->id);
-        })->with(['messages' => function ($query) {
-            $query->orderBy('created_at', 'DESC')->first();
-        }])->orderBy('created_at', 'DESC')->get();
+        $conversations = Conversation::with('latestMessage')
+            ->withReceiverUsers()
+            ->orderBy('created_at', 'DESC')
+            ->get();
 
         return ConversationResource::collection($conversations);
     }

@@ -19,10 +19,10 @@ class ConversationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->is_group ? $this->name : $this->users->first()->name,
             'is_group' => $this->is_group,
             'users' => UserResource::collection($this->whenLoaded('users')),
-            'messages' => MessageResource::collection($this->whenLoaded('messages')),
+            'latest_message' => MessageResource::make($this->whenLoaded('latestMessage')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
