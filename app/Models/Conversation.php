@@ -26,9 +26,7 @@ class Conversation extends Model
 
         static::deleting(function ($conversation) {
             $conversation->messages()->delete();
-            DB::table('conversation_user')
-                ->where('conversation_id', $conversation->id)
-                ->delete();
+            $conversation->users()->detach();
         });
     }
 
