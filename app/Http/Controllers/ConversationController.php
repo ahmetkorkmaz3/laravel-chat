@@ -12,7 +12,6 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use PHPUnit\Util\Exception;
 
 class ConversationController extends Controller
