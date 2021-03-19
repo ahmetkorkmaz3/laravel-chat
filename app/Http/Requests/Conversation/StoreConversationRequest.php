@@ -33,7 +33,6 @@ class StoreConversationRequest extends FormRequest
             'name' => [
                 'string',
                 'min:3',
-                'required_with:is_group',
             ],
             'to_user_id' => [
                 'array',
@@ -44,5 +43,11 @@ class StoreConversationRequest extends FormRequest
                 Rule::notIn([auth()->user()->id]),
             ],
         ];
+    }
+    public function withValidator($validator)
+    {
+        $validator->sometimes('name', 'required', function ($input) {
+            return count($input->to_user_id) > 1;
+        });
     }
 }

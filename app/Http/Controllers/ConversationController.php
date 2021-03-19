@@ -12,6 +12,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Util\Exception;
 
 class ConversationController extends Controller
@@ -44,13 +45,18 @@ class ConversationController extends Controller
         DB::beginTransaction();
         try {
             $authUser = auth()->user();
-            $conversation = Conversation::create($request->validated());
+            $toUserIds = $request->to_user_id;
+            $isGroup = false;
+            if (count($toUserIds) > 1) {
+                $isGroup = true;
+            }
+            $conversation = Conversation::create($request->validated() + ['is_group' => $isGroup]);
 
-            $users = $request->to_user_id;
+            $users = $toUserIds;
             array_push($users, $authUser->id);
             $conversation->users()->attach($users);
 
-            foreach ($request->to_user_id as $userId) {
+            foreach ($toUserIds as $userId) {
                 event(new ConversationEvent(
                     ConversationResource::make($conversation),
                     UserResource::make($authUser),
