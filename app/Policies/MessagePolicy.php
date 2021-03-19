@@ -6,18 +6,9 @@ use App\Models\Conversation;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ConversationPolicy
+class MessagePolicy
 {
     use HandlesAuthorization;
-
-    /**
-     * @param User $user
-     * @return bool
-     */
-    public function viewAny(User $user): bool
-    {
-        return true;
-    }
 
     /**
      * @param User $user
@@ -31,29 +22,10 @@ class ConversationPolicy
 
     /**
      * @param User $user
-     * @return bool
-     */
-    public function create(User $user): bool
-    {
-        return true;
-    }
-
-    /**
-     * @param User $user
      * @param Conversation $conversation
      * @return bool
      */
-    public function update(User $user, Conversation $conversation): bool
-    {
-        return $this->queryUserInConversation($user, $conversation);
-    }
-
-    /**
-     * @param User $user
-     * @param Conversation $conversation
-     * @return bool
-     */
-    public function delete(User $user, Conversation $conversation): bool
+    public function create(User $user, Conversation $conversation): bool
     {
         return $this->queryUserInConversation($user, $conversation);
     }

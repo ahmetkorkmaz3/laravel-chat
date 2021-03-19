@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ConversationEvent;
+use App\Events\MessageEvent;
 use App\Http\Requests\Message\StoreMessageRequest;
 use App\Http\Resources\Message\MessageResource;
 use App\Models\Conversation;
@@ -19,7 +19,7 @@ class MessageController extends Controller
      */
     public function index(Conversation $conversation): AnonymousResourceCollection
     {
-        $this->authorize('view', $conversation);
+        $this->authorize('view', [Message::class, $conversation]);
 
         $messages = Message::where('conversation_id', $conversation->id)
             ->with(['conversation', 'user'])
@@ -39,7 +39,7 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request, Conversation $conversation): MessageResource
     {
-        $this->authorize('create', $conversation);
+        $this->authorize('create', [Message::class, $conversation]);
 
         $message = $conversation->messages()->create(array_merge(
             $request->validated(),
@@ -48,10 +48,10 @@ class MessageController extends Controller
 
         if ($conversation->is_group) {
             $conversation->receiverUser()->each(function ($user) use ($message) {
-                event(new ConversationEvent($message, $user->id));
+                event(new MessageEvent(MessageResource::make($message), $user->id));
             });
         } else {
-            event(new ConversationEvent($message, $conversation->receiverUser()->id));
+            event(new MessageEvent(MessageResource::make($message), $conversation->receiverUser()->id));
         }
 
         return MessageResource::make($message);

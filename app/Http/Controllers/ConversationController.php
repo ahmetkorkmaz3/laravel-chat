@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ConversationEvent;
 use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Requests\Conversation\UpdateConversationRequest;
 use App\Http\Resources\Conversation\ConversationResource;
+use App\Http\Resources\User\UserResource;
 use App\Models\Conversation;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Util\Exception;
 
 class ConversationController extends Controller
@@ -41,10 +44,20 @@ class ConversationController extends Controller
 
         DB::beginTransaction();
         try {
+            $authUser = auth()->user();
             $conversation = Conversation::create($request->validated());
+
             $users = $request->to_user_id;
-            array_push($users, auth()->user()->id);
+            array_push($users, $authUser->id);
             $conversation->users()->attach($users);
+
+            foreach ($request->to_user_id as $userId) {
+                event(new ConversationEvent(
+                    ConversationResource::make($conversation),
+                    UserResource::make($authUser),
+                    $userId
+                ));
+            }
         } catch (Exception $exception) {
             DB::rollBack();
             abort(500, $exception);

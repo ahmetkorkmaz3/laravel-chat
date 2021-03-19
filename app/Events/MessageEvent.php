@@ -8,25 +8,22 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ConversationEvent implements ShouldBroadcast
+class MessageEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $conversation;
-    public $fromUser;
+    public $message;
     public $toUserId;
 
     /**
-     * ConversationEvent constructor.
+     * MessageEvent constructor.
      *
-     * @param $conversation
-     * @param $fromUser
+     * @param $message
      * @param $toUserId
      */
-    public function __construct($conversation, $fromUser, $toUserId)
+    public function __construct($message, $toUserId)
     {
-        $this->conversation = $conversation;
-        $this->fromUser = $fromUser;
+        $this->message = $message;
         $this->toUserId = $toUserId;
     }
 
@@ -43,6 +40,6 @@ class ConversationEvent implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return 'conversation-event';
+        return 'message-event';
     }
 }
