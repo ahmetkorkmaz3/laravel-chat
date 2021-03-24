@@ -10,6 +10,8 @@
 
 > Laravel chat api with pusher. One to one, one to many chat api
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/93344465a6420db54bf9)
+
 ## Author
 
 👤 **Murat Ahmet Korkmaz**
