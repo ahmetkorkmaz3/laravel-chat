@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Events\MessageEvent;
 use App\Http\Requests\Message\StoreMessageRequest;
+use App\Http\Resources\Notification\ConversationResource;
 use App\Http\Resources\Message\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Notifications\MessageNotification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Notification;
 
 class MessageController extends Controller
 {
@@ -46,13 +49,24 @@ class MessageController extends Controller
             ['user_id' => auth()->user()->id]
         ));
 
+        $receiverUser = $conversation->receiverUser();
+
         if ($conversation->is_group) {
-            $conversation->receiverUser()->each(function ($user) use ($message) {
+            $receiverUser->each(function ($user) use ($message) {
                 event(new MessageEvent(MessageResource::make($message), $user->id));
             });
         } else {
-            event(new MessageEvent(MessageResource::make($message), $conversation->receiverUser()->id));
+            event(new MessageEvent(MessageResource::make($message), $receiverUser->id));
         }
+
+        $message->load('user');
+
+        Notification::send(
+            $receiverUser,
+            new MessageNotification(
+                ConversationResource::make($conversation),
+                MessageResource::make($message))
+        );
 
         return MessageResource::make($message);
     }
