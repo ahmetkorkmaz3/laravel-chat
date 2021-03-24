@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\MessageController;
-use Illuminate\Support\Facades\Broadcast;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +47,12 @@ Route::middleware('auth:api')->group(function () {
                 Route::post('', [MessageController::class, 'store']);
             });
         });
+    });
+
+    Route::prefix('notifications')->group(function () {
+        Route::get('', [NotificationController::class, 'index']);
+        Route::delete('', [NotificationController::class, 'destroy']);
+        Route::post('/read', [NotificationController::class, 'readAllNotifications']);
     });
 
 });
