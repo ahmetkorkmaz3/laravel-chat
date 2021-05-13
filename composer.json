@@ -17,6 +17,7 @@
         "laravel/telescope": "^4.4",
         "laravel/tinker": "^2.5",
         "pusher/pusher-php-server": "^5.0",
+        "swooletw/laravel-swoole": "^2.8",
         "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {

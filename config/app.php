@@ -166,6 +166,7 @@ return [
          * Package Service Providers...
          */
 
+        SwooleTW\Http\LaravelServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
         /*
