@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:8
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: 'laravel_chat'
+      MYSQL_USER: 'chat'
+      MYSQL_PASSWORD: '123456789'
+      MYSQL_ROOT_PASSWORD: '123456789'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+    - chat-db:/var/lib/mysql
+
+volumes:
+  chat-db:
