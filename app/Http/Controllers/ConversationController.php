@@ -42,7 +42,6 @@ class ConversationController extends Controller
     {
         $this->authorize('create', Conversation::class);
 
-
         DB::beginTransaction();
         try {
             $authUser = auth()->user();
